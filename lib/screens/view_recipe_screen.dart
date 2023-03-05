@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lab_assignment/models/recipe.dart';
 import 'package:lab_assignment/resources/recipe_methods.dart';
+import 'package:lab_assignment/screens/home_screen.dart';
 
 class ViewRecipe extends StatefulWidget {
   final Map<String, dynamic> recipe;
@@ -67,6 +68,46 @@ class _ViewRecipeState extends State<ViewRecipe> {
     });
   }
 
+  deleteRecipe(BuildContext context) async {
+    Widget cancelButton = ElevatedButton(
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+      child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = ElevatedButton(
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+      child: const Text(
+        "Delete",
+        style: TextStyle(color: Colors.white),
+      ),
+      onPressed: () {
+        RecipeMethods().deleteRecipe(recipeId: widget.recipe['id']);
+        Navigator.of(context).pop();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("Delete Recipe"),
+      content: const Text("Are you sure you want to delete this recipe?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -108,8 +149,7 @@ class _ViewRecipeState extends State<ViewRecipe> {
                       _isEditing = false;
                     });
 
-                    RecipeMethods().deleteRecipe(recipeId: widget.recipe['id']);
-                    Navigator.pop(context);
+                    deleteRecipe(context);
                   },
                   icon: const Icon(
                     Icons.delete,
